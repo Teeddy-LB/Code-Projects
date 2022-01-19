@@ -1,0 +1,114 @@
+import discord
+from discord.ext import commands
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import os
+from selenium.webdriver.chrome.options import Options
+
+chrome_options = Options()
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+
+driver = webdriver.Chrome(options=chrome_options)
+
+# Gets token
+my_secret = os.environ['TOKEN']
+
+client = discord.Client();
+
+# Sends a message when the bot is ready
+@client.event
+async def on_ready():
+  print("Logged in as {0.user}".format(client))
+
+client = commands.Bot(command_prefix="-")
+
+# Main command: used to search up a certain team
+@client.command(
+	help="Gets a team's score: -team (team id i.e. 14-3292).",
+	brief="Gets a certian team's scores and prints it back."
+)
+async def team(ctx, arg):
+  url1 = "http://scoreboard.uscyberpatriot.org/team.php?team=%s" % (arg)
+  driver.get(url1)
+
+  height = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody").size
+  height = height['height']
+
+  # Gets reigon
+  reigon = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[1]/tbody/tr[2]/td[2]").text
+
+  # Gets time and score 1
+  time1 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[2]/td[2]").text
+
+  score1 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[2]/td[6]").text
+
+  name1 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[2]/td[1]").text
+  name1 = name1.split("_",1)
+  name1 = name1[0]
+
+  # Gets time and score 2
+  time2 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[3]/td[2]").text
+
+  score2 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[3]/td[6]").text
+
+  name2 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[3]/td[1]").text
+  name2 = name2.split("_",1)
+  name2 = name2[0]
+
+  if height == 117:
+    time3 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[4]/td[2]").text
+
+    score3 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[4]/td[6]").text
+
+    name3 = driver.find_element(By.XPATH, "/html/body/div[2]/div/table[2]/tbody/tr[4]/td[1]").text
+    name3 = name3.split("_",1)
+    name3 = name3[0]
+
+    totalscore = int(score1) + int(score2) + int(score3)
+    message3 = ("%s's %s time and score are: %s and %s" % (arg, name3, time3, score3))
+
+  else: totalscore = int(score1) + int(score2)
+
+  message1 = ("%s's %s time and score are: %s and %s" % (arg, name1, time1, score1))
+  message2 = ("%s's %s time and score are: %s and %s" % (arg, name2, time2, score2))
+  message4 = ("%s's total score is %s points, and they are in [LOADING] place." % (arg, totalscore))
+
+
+  embed = discord.Embed(title = "Team " + arg, url = url1, description = arg + " is a team from " + reigon)
+  embed.set_thumbnail(url="https://i.imgur.com/UZOiwG9.png")
+  embed.add_field(name=name1, value= message1, inline=False)
+  embed.add_field(name=name2, value= message2, inline=False)
+  if height == 117:
+    embed.add_field(name=name3, value= message3, inline=False)
+  embed.add_field(name="Total", value= message4, inline=False)
+
+  messageEdit = await ctx.channel.send(embed = embed)
+
+  if driver.find_element(By.XPATH, "/html/body/div[2]/div/table[1]/tbody/tr[2]/td[3]").text == "Open":
+    driver.get("http://scoreboard.uscyberpatriot.org/index.php?division=Open")
+  else: 
+    driver.get("http://scoreboard.uscyberpatriot.org/index.php?division=Middle%20School")
+  
+
+  i = 1
+  url2 = "/html/body/div[2]/div/table/tbody/tr[" + str(i) + "]/td[2]"
+  while driver.find_element(By.XPATH, url2).text != arg:
+    i = i + 1
+    url2 = "/html/body/div[2]/div/table/tbody/tr[" + str(i) + "]/td[2]"
+
+  i = i - 1
+
+  message4 = ("%s's total score is %s points, and they are in %s place." % (arg, totalscore, i))
+
+  embed2 = discord.Embed(title = "Team " + arg, url = url1, description = arg + " is a team from " + reigon)
+  embed2.set_thumbnail(url="https://i.imgur.com/UZOiwG9.png")
+  embed2.add_field(name=name1, value= message1, inline=False)
+  embed2.add_field(name=name2, value= message2, inline=False)
+  if height == 117:
+    embed2.add_field(name=name3, value= message3, inline=False)
+  embed2.add_field(name = "Total", value = message4, inline = False)
+
+  await messageEdit.edit(embed = embed2)
+
+client.run(my_secret)
