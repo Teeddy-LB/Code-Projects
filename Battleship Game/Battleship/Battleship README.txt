@@ -1,0 +1,2 @@
+This one was rough. This game is a recreation of battleship where you play against a computer. The two biggest challenges was the ships clipping out of bounds, and making a semi playable AI. Needless to say, it's a bit buggy.
+If you'd like to play, it uses packages tkinter, keyboard, time and random.
