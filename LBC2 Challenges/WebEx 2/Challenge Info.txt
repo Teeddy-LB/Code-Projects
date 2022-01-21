@@ -1,0 +1,5 @@
+The website will immeadeatley redirect upon loading. To stop this, you can disable javascript. Then inspect element, and find the link to the correct page.
+
+Name: Never gonna give up
+Question: Check out my cool new website (INSERT URL HERE)! Can you find all of it's secrets?
+Answer: lbctf(Wa$nT_TH@t_fUn?_:)}

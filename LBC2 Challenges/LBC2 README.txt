@@ -1,0 +1,1 @@
+These are challenges are for entry level competitors for LBC2. Unfortunately, I can only share these and not more challenging tasks to prevent cheating.

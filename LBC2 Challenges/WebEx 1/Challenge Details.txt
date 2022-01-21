@@ -1,0 +1,9 @@
+There is a website. You have to make the guess that the flag is stored on the page flag.html
+
+Name: Educated Guess
+
+Question: Check out my website! I've hidden a flag somewhere around here, try to search around and find it.
+
+Hint: The flag isn't in the page that initally loads. Try messing with the URL.
+
+Answer: lbctf{th@t_w@$_3Z!}
